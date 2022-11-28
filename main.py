@@ -1,7 +1,6 @@
-
+# DM Algo
 # Auteur : Loïc Pottier
 # Date de création : 28/11/2022
-# DM Algo
 
 def menu():
     print("Menu")
