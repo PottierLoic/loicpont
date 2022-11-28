@@ -155,17 +155,16 @@ def game():
         ch=choix(next_pieces, stock)
         if ch=="S":
             stockPiece(next_pieces[0], stock)
+            next_pieces.pop(0)
             choix(next_pieces, stock)
         elif ch=="R":
-            rotate("R")
+            rotate(next_pieces[0], "R")
         elif ch=="S":
-            rotate("S")
-        elif 0<ch<9:
+            rotate(next_pieces[0], "S")
+        elif :
             addPiece(tab, next_pieces[0], ch)
-        else :
+        else:
             print("Choix invalide !")
         
-
-
 # Lancement du jeu
 menu()
