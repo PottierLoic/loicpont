@@ -16,7 +16,8 @@ h_end=2
 # premier index = piece
 # deuxieme index = nom ou forme
 # troisieme index = ligne de la piece
-pieces=[["i_piece", [[1, 1, 1, 1]]],
+pieces=[["i_piece", [[0, 0, 0, 0],
+                     [1, 1, 1, 1]]],
         ["o_piece", [[1, 1], 
                      [1, 1]]],
         ["t_piece", [[0, 1, 0],
@@ -131,15 +132,35 @@ def aleaPiece(pieces):
 
 # Retourne la piece donnée en paramètre tournée dans le sens voulu
 def rotate(piece, sens):
+    print("rotate")
     return piece    
 
 # Ajoute la piece au plateau
-def addPiece(tab, piece, position):
-    pass
+def addPiece(piece, position):
+    valide=True
+    posValide=0
+    for ligne in range(0,9):
+        for i in range(len(piece[1])-1):
+            for j in range(len(piece[1][i])-1):
+                if piece[1][i][j]==1 and tab[ligne+i][int(position)-1+j]!=0:
+                    valide=False
+        if valide:
+            posValide=ligne
+
+    for i in range(len(piece[1])):
+        for j in range(len(piece[1][i])):
+            if piece[1][i][j]==1:
+                tab[posValide+i][int(position)+j-1]=piece[1][i][j]
+                
+    return(tab)
+
 
 # Ajoute la piece actuelle au stock
 def stockPiece(piece, stock):
-    stock=piece
+    return piece
+
+def checkWin():
+    return False
 
 # Boucle du jeu
 def game():
@@ -149,22 +170,35 @@ def game():
         next_pieces.append(aleaPiece(pieces))
 
     print("DEBUT DU JEU")
-    affichage()
+    
 
     while True:
+        affichage()
+
         ch=choix(next_pieces, stock)
+
         if ch=="S":
-            stockPiece(next_pieces[0], stock)
+            stock=stockPiece(next_pieces[0], stock)
             next_pieces.pop(0)
-            choix(next_pieces, stock)
+            next_pieces.append(aleaPiece(pieces))
         elif ch=="R":
             rotate(next_pieces[0], "R")
         elif ch=="S":
-            rotate(next_pieces[0], "S")
-        elif :
-            addPiece(tab, next_pieces[0], ch)
+            rotate(next_pieces[0], "L")
+        elif ch=="1" or "2" or "3" or "4" or "5" or "6" or "7" or "8" or "9" or "10":
+            tab=addPiece(next_pieces[0], ch)
+            next_pieces.pop(0)
+            next_pieces.append(aleaPiece(pieces))
         else:
             print("Choix invalide !")
         
+        if checkWin():
+            print("Vous avez gagné !")
+            print("")
+            break
+        
+
+
+
 # Lancement du jeu
 menu()
