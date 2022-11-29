@@ -4,6 +4,7 @@
 
 # IMPORTS
 import random as rd
+import os
 
 # Tableau de jeu vide
 tab=[]
@@ -16,8 +17,7 @@ h_end=2
 # premier index = piece
 # deuxieme index = nom ou forme
 # troisieme index = ligne de la piece
-pieces=[["i_piece", [[0, 0, 0, 0],
-                     [1, 1, 1, 1]]],
+pieces=[["i_piece", [[1, 1, 1, 1]]],
         ["o_piece", [[1, 1], 
                      [1, 1]]],
         ["t_piece", [[0, 1, 0],
@@ -117,13 +117,30 @@ def choix(next_pieces, stock):
 
 # Affichage du plateau de jeu
 def affichage():
+    symbol=""
     for ligne in range (len(tab)-1):
         if ligne == 5:
-            print("Départ-"+str(tab[ligne]))
-        elif ligne == 2:
-            print("       "+str(tab[ligne])+"-Arrivée")
+            print("Départ-", end="")
         else:
-            print("       "+str(tab[ligne]))
+            print("       ", end="")
+        for col in range (len(tab[0])-1):
+            if col!=8:
+                if tab[ligne][col]==0:
+                    print("□ ", end="")
+                else:
+                    print("■ ", end="")
+            elif col==8 and ligne==2:
+                if tab[ligne][col]==0:
+                    print("□-Arrivée")
+                else:
+                    print("■-Arrivée")
+            else:
+                if tab[ligne][col]==0:
+                    print("□ ")
+                else:
+                    print("■ ")
+            
+
     print("")
 
 # Retourne un pièce aléatoire parmi la liste "pieces"
@@ -131,18 +148,32 @@ def aleaPiece(pieces):
     return(rd.choice(pieces))
 
 # Retourne la piece donnée en paramètre tournée dans le sens voulu
-def rotate(piece, sens):
-    print("rotate")
-    return piece    
+def rotateL(piece):
+    piece2=[]
+    piece2.append(piece[0])
+    piece2.append([])
+
+    for i in range (len(piece[1][0])):
+        piece2[1].append([])
+    for i in range (len(piece[1])):
+        for j in range (len(piece[1][i])):
+            piece2[1][len(piece[1][0])-j-1].append(piece[1][i][j])
+
+    return piece2
+
+def rotateR(piece):
+    for i in range(3):
+        piece=rotateL(piece)
+    return piece
 
 # Ajoute la piece au plateau
 def addPiece(piece, position):
     valide=True
     posValide=0
-    for ligne in range(0,9):
-        for i in range(len(piece[1])-1):
-            for j in range(len(piece[1][i])-1):
-                if piece[1][i][j]==1 and tab[ligne+i][int(position)-1+j]!=0:
+    for ligne in range(0, 9-len(piece[1])+2):
+        for i in range(len(piece[1])):
+            for j in range(len(piece[1][i])):
+                if piece[1][i][j]==1 and tab[ligne+i][int(position)+j-1]!=0:
                     valide=False
         if valide:
             posValide=ligne
@@ -151,13 +182,7 @@ def addPiece(piece, position):
         for j in range(len(piece[1][i])):
             if piece[1][i][j]==1:
                 tab[posValide+i][int(position)+j-1]=piece[1][i][j]
-                
     return(tab)
-
-
-# Ajoute la piece actuelle au stock
-def stockPiece(piece, stock):
-    return piece
 
 def checkWin():
     return False
@@ -169,22 +194,27 @@ def game():
     for i in range(3):
         next_pieces.append(aleaPiece(pieces))
 
+    os.system('cls')
+
     print("DEBUT DU JEU")
     
-
     while True:
         affichage()
 
         ch=choix(next_pieces, stock)
 
         if ch=="S":
-            stock=stockPiece(next_pieces[0], stock)
+            stock=next_pieces[0]
             next_pieces.pop(0)
             next_pieces.append(aleaPiece(pieces))
         elif ch=="R":
-            rotate(next_pieces[0], "R")
-        elif ch=="S":
-            rotate(next_pieces[0], "L")
+            p=rotateR(next_pieces[0])
+            next_pieces.pop(0)
+            next_pieces.insert(0, p)
+        elif ch=="L":
+            p=rotateL(next_pieces[0])
+            next_pieces.pop(0)
+            next_pieces.insert(0, p)
         elif ch=="1" or "2" or "3" or "4" or "5" or "6" or "7" or "8" or "9" or "10":
             tab=addPiece(next_pieces[0], ch)
             next_pieces.pop(0)
@@ -196,9 +226,9 @@ def game():
             print("Vous avez gagné !")
             print("")
             break
+    
+    
         
-
-
-
 # Lancement du jeu
+os.system('cls')
 menu()
