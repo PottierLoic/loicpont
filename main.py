@@ -13,6 +13,9 @@ tab=[]
 h_start=5
 h_end=2
 
+longueur=10
+largeur=10
+
 # Liste des différentes pièces en rotation normale
 # premier index = piece
 # deuxieme index = nom ou forme
@@ -41,14 +44,7 @@ def menu():
 
     choix=input("Choissisez une option : ")
     print("")
-    if choix=="4":
-        quit()
-    elif choix=="3":
-        credits()
-    elif choix=="2":
-        options()
-    elif choix=="1":
-        start(tab)
+    return(choix)
 
 # Lancement du menu "crédits"
 def credits():
@@ -57,7 +53,6 @@ def credits():
     print("Date de creation : 28/11/2022")
     print("RATIOOOOOOOO")
     input("")
-    menu()
 
 # Lancement du menu "options"
 def options():
@@ -67,9 +62,7 @@ def options():
     print("3 - Retour")
     choix=input("Choissisez une option : ")
     print("")
-    if choix=="3":
-        menu()
-    elif choix=="2":
+    if choix=="2":
         h_start=input("Hauteur du départ : ")
         print("")
         options()
@@ -78,20 +71,18 @@ def options():
         print("")
         options()
     input("") 
-    menu()
 
 # Création du plateau de jeu
 def start(tab):
-    for i in range(10):
+    for i in range(longueur):
         tab.append([])
-        for j in range(10):
+        for j in range(largeur):
             tab[i].append(0)
     tab.append([h_start, h_end])
-    game()
+    return tab
 
 # Demande du choix du joueur pour le tour actuel
 def choix(next_pieces, stock):
-
     print("Choix   : 0-9 : Placer la piece dans une colonne")
     print("R : Rotation horaire de la piece")
     print("L : Roation trigonométrique de la piece")
@@ -115,8 +106,14 @@ def choix(next_pieces, stock):
 
     return(input("Veuillez entrer votre choix : "))
 
+# Demande au joueur de valider la prévisualisation
+def validationPrevisu():
+    print("Ce placement vous convient ?")
+
+    return(input("O / N"))
+
 # Affichage du plateau de jeu
-def affichage():
+def affichage(tab):
     symbol=""
     for ligne in range (len(tab)-1):
         if ligne == 5:
@@ -140,7 +137,6 @@ def affichage():
                 else:
                     print("■ ")
             
-
     print("")
 
 # Retourne un pièce aléatoire parmi la liste "pieces"
@@ -167,10 +163,10 @@ def rotateR(piece):
     return piece
 
 # Ajoute la piece au plateau
-def addPiece(piece, position):
+def addPiece(tab, piece, position):
     valide=True
     posValide=0
-    for ligne in range(0, 9-len(piece[1])+2):
+    for ligne in range(0, longueur-len(piece[1])+1):
         for i in range(len(piece[1])):
             for j in range(len(piece[1][i])):
                 if piece[1][i][j]==1 and tab[ligne+i][int(position)+j-1]!=0:
@@ -184,6 +180,13 @@ def addPiece(piece, position):
                 tab[posValide+i][int(position)+j-1]=piece[1][i][j]
     return(tab)
 
+def previsu(tab, piece, position):
+    for i in range(len(piece[1])):
+        for j in range(len(piece[1][i])):
+            if piece[1][i][j]==1:
+                tab[i][int(position)+j-1]=piece[1][i][j]
+    return(tab)
+
 def checkWin():
     return False
 
@@ -191,16 +194,31 @@ def checkWin():
 def game():
     stock=[]
     next_pieces=[]
+    tab=[]
+    tab_tempo=[]
+    demarrage=False
+
     for i in range(3):
         next_pieces.append(aleaPiece(pieces))
-
-    os.system('cls')
-
-    print("DEBUT DU JEU")
     
+    while not demarrage:
+        m=menu()
+        if m=="4":
+            quit()
+        elif m=="3":
+            credits()
+        elif m=="2":
+            options()
+        elif m=="1":
+            tab=start(tab)
+            tab_tempo=start(tab_tempo)
+            demarrage=True
+            
+    os.system('cls')  
+    print("DEBUT DU JEU")
     while True:
-        affichage()
-
+        affichage(tab)
+        pos=0
         ch=choix(next_pieces, stock)
 
         if ch=="S":
@@ -215,13 +233,22 @@ def game():
             p=rotateL(next_pieces[0])
             next_pieces.pop(0)
             next_pieces.insert(0, p)
+
+
         elif ch=="1" or "2" or "3" or "4" or "5" or "6" or "7" or "8" or "9" or "10":
-            tab=addPiece(next_pieces[0], ch)
-            next_pieces.pop(0)
-            next_pieces.append(aleaPiece(pieces))
+            tab_tempo=previsu(tab_tempo, next_pieces[0], ch)
+            affichage(tab_tempo)
+            if validationPrevisu()=="O":
+                tab=addPiece(tab, next_pieces[0], ch)
+                tab_tempo=tab
+                next_pieces.pop(0)
+                next_pieces.append(aleaPiece(pieces))
+            else:
+                tab_tempo=tab
+            
         else:
             print("Choix invalide !")
-        
+
         if checkWin():
             print("Vous avez gagné !")
             print("")
@@ -231,4 +258,4 @@ def game():
         
 # Lancement du jeu
 os.system('cls')
-menu()
+game()
