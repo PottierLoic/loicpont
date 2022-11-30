@@ -227,7 +227,7 @@ def game():
             print("")
             break
     
-    
+        os.system('cls')
         
 # Lancement du jeu
 os.system('cls')
