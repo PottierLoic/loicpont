@@ -157,6 +157,7 @@ def rotateL(piece):
 
     return piece2
 
+# Retourne la piece donnée en paramètre tournée dans le sens voulu
 def rotateR(piece):
     for i in range(3):
         piece=rotateL(piece)
@@ -180,6 +181,7 @@ def addPiece(tab, piece, position):
                 tab[posValide+i][int(position)+j-1]=piece[1][i][j]
     return(tab)
 
+# Ajoute la piece actuelle eu haut du tableau
 def previsu(tab, piece, position):
     for i in range(len(piece[1])):
         for j in range(len(piece[1][i])):
@@ -187,6 +189,7 @@ def previsu(tab, piece, position):
                 tab[i][int(position)+j-1]=piece[1][i][j]
     return(tab)
 
+# Verifie si le joueur a gagné
 def checkWin():
     return False
 
