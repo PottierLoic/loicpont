@@ -6,9 +6,6 @@
 import random as rd
 import os
 
-# Tableau de jeu vide
-tab=[]
-
 # Positions de base du départ et de l'arrivée
 h_start=5
 h_end=2
@@ -120,13 +117,13 @@ def affichage(tab):
             print("Départ-", end="")
         else:
             print("       ", end="")
-        for col in range (len(tab[0])-1):
-            if col!=8:
+        for col in range (len(tab[0])):
+            if col!=9:
                 if tab[ligne][col]==0:
                     print("□ ", end="")
                 else:
                     print("■ ", end="")
-            elif col==8 and ligne==2:
+            elif col==9 and ligne==2:
                 if tab[ligne][col]==0:
                     print("□-Arrivée")
                 else:
@@ -190,15 +187,31 @@ def previsu(tab, piece, position):
     return(tab)
 
 # Verifie si le joueur a gagné
-def checkWin():
-    return False
+def checkWin(tab):
+    h_actu=h_start
+    v=True
+    for col in range(largeur):
+        if tab[h_actu-1][col]:
+            h_actu-=1
+        elif tab[h_actu][col]:
+            pass
+        elif tab[h_actu+1][col]:
+            h_actu+=1
+        else:
+            v=False
 
+    if not (h_actu>=h_end-1 and h_actu<=h_end+1):
+        v=False
+    
+    return v
+        
+    
 # Boucle du jeu
 def game():
     stock=[]
     next_pieces=[]
     tab=[]
-    tab_tempo=[]
+    tab1=[]
     demarrage=False
 
     for i in range(3):
@@ -214,15 +227,18 @@ def game():
             options()
         elif m=="1":
             tab=start(tab)
-            tab_tempo=start(tab_tempo)
+            tab1=start(tab1)
             demarrage=True
-            
+
     os.system('cls')  
     print("DEBUT DU JEU")
     while True:
         affichage(tab)
-        pos=0
         ch=choix(next_pieces, stock)
+
+        for i in range(longueur):
+            for j in range (largeur):
+                tab1[i][j]=tab[i][j]
 
         if ch=="S":
             stock=next_pieces[0]
@@ -236,29 +252,33 @@ def game():
             p=rotateL(next_pieces[0])
             next_pieces.pop(0)
             next_pieces.insert(0, p)
+        elif ch=="1" or "2" or "3" or "4" or "5" or "6" or "7" or "8" or "9" or "10": 
+            affichage(previsu(tab1, next_pieces[0], ch))
 
-
-        elif ch=="1" or "2" or "3" or "4" or "5" or "6" or "7" or "8" or "9" or "10":
-            tab_tempo=previsu(tab_tempo, next_pieces[0], ch)
-            affichage(tab_tempo)
             if validationPrevisu()=="O":
-                tab=addPiece(tab, next_pieces[0], ch)
-                tab_tempo=tab
+                addPiece(tab1, next_pieces[0], ch)
+                addPiece(tab, next_pieces[0], ch)
                 next_pieces.pop(0)
                 next_pieces.append(aleaPiece(pieces))
-            else:
-                tab_tempo=tab
-            
+                print("validé")
         else:
             print("Choix invalide !")
 
-        if checkWin():
-            print("Vous avez gagné !")
-            print("")
+        if checkWin(tab):
             break
+    os.system('cls')
+    if checkWin(tab):
+        affichage(tab)
     
-        os.system('cls')
         
 # Lancement du jeu
 os.system('cls')
-game()
+
+while True:
+    game()
+    print("")
+    print("")
+    print("Bravo, vous avez gagné !")
+    if input("Recommencer une partie ? O/N")!="O":
+        print("Bye bye !")
+        quit()
