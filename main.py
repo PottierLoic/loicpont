@@ -5,6 +5,7 @@
 # IMPORTS
 import random as rd
 import os
+import copy
 
 # Positions de base du départ et de l'arrivée
 h_start=5
@@ -204,8 +205,7 @@ def checkWin(tab):
         v=False
     
     return v
-        
-    
+
 # Boucle du jeu
 def game():
     stock=[]
@@ -241,9 +241,15 @@ def game():
                 tab1[i][j]=tab[i][j]
 
         if ch=="S":
-            stock=next_pieces[0]
-            next_pieces.pop(0)
-            next_pieces.append(aleaPiece(pieces))
+            if stock==[]:
+                stock=next_pieces[0]
+                next_pieces.pop(0)
+                next_pieces.append(aleaPiece(pieces))
+            else:
+                temp=copy.deepcopy(stock)
+                stock=next_pieces[0]
+                next_pieces.pop(0)
+                next_pieces.insert(0, temp)
         elif ch=="R":
             p=rotateR(next_pieces[0])
             next_pieces.pop(0)
@@ -253,17 +259,20 @@ def game():
             next_pieces.pop(0)
             next_pieces.insert(0, p)
         elif ch=="1" or "2" or "3" or "4" or "5" or "6" or "7" or "8" or "9" or "10": 
-            affichage(previsu(tab1, next_pieces[0], ch))
+            if int(ch)+len(next_pieces[0][1][0])-2<largeur:
+                affichage(previsu(tab1, next_pieces[0], ch))
 
-            if validationPrevisu()=="O":
-                addPiece(tab1, next_pieces[0], ch)
-                addPiece(tab, next_pieces[0], ch)
-                next_pieces.pop(0)
-                next_pieces.append(aleaPiece(pieces))
-                print("validé")
+                if validationPrevisu()=="O":
+                    addPiece(tab1, next_pieces[0], ch)
+                    addPiece(tab, next_pieces[0], ch)
+                    next_pieces.pop(0)
+                    next_pieces.append(aleaPiece(pieces))
+                    print("validé")
+            else:
+                print("raté")
         else:
             print("Choix invalide !")
-
+            
         if checkWin(tab):
             break
     os.system('cls')
