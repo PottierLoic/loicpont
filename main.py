@@ -1,23 +1,23 @@
 # DM Algo
-# Auteur : Loïc Pottier
-# Date de création : 28/11/2022
+# Author : Loïc Pottier
+# date : 28/11/2022
 
 # IMPORTS
 import random as rd
 import os
 import copy
 
-# Positions de base du départ et de l'arrivée
+# start en end position
 h_start=5
 h_end=2
 
-longueur=10
-largeur=10
+length=10
+width=10
 
-# Liste des différentes pièces en rotation normale
-# premier index = piece
-# deuxieme index = nom ou forme
-# troisieme index = ligne de la piece
+# List of all the different pieces
+# 1st index = piece list
+# 2nd index = name, lines
+# 3rd index = col
 pieces=[["i_piece", [[1, 1, 1, 1]]],
         ["o_piece", [[1, 1], 
                      [1, 1]]],
@@ -32,7 +32,7 @@ pieces=[["i_piece", [[1, 1, 1, 1]]],
         ["s_piece", [[0, 1, 1],
                      [1, 1, 0]]]]
 
-# Lancement du menu principal
+# main menu
 def menu():
     print("----- LE JEU DU RATIOOOO -----")
     print("1 - Nouvelle partie")
@@ -44,15 +44,14 @@ def menu():
     print("")
     return(choix)
 
-# Lancement du menu "crédits"
+# credit menu
 def credits():
     print("-----Credits-----")
     print("Auteur : Loïc Pottier")
     print("Date de creation : 28/11/2022")
-    print("RATIOOOOOOOO")
     input("")
 
-# Lancement du menu "options"
+# options menu
 def options():
     print("-----Options-----")
     print("1 - Changer la hauteur de départ")
@@ -70,16 +69,18 @@ def options():
         options()
     input("") 
 
-# Création du plateau de jeu
+# creation of game board
+# 10x10 list of 0
 def start(tab):
-    for i in range(longueur):
+    for i in range(length):
         tab.append([])
-        for j in range(largeur):
+        for j in range(width):
             tab[i].append(0)
     tab.append([h_start, h_end])
     return tab
 
-# Demande du choix du joueur pour le tour actuel
+# asks the user choice for the actual turn
+# return the input value
 def choix(next_pieces, stock):
     print("Choix   : 0-9 : Placer la piece dans une colonne")
     print("R : Rotation horaire de la piece")
@@ -104,13 +105,13 @@ def choix(next_pieces, stock):
 
     return(input("Veuillez entrer votre choix : "))
 
-# Demande au joueur de valider la prévisualisation
+# asks the usr validation for the previsualisation displayed previously
 def validationPrevisu():
     print("Ce placement vous convient ?")
 
     return(input("O / N"))
 
-# Affichage du plateau de jeu
+# print the game board in parameter
 def affichage(tab):
     symbol=""
     for ligne in range (len(tab)-1):
@@ -137,11 +138,12 @@ def affichage(tab):
             
     print("")
 
-# Retourne un pièce aléatoire parmi la liste "pieces"
-def aleaPiece(pieces):
+# return a random piece from "pieces"
+def aleaPiece():
+    global pieces
     return(rd.choice(pieces))
 
-# Retourne la piece donnée en paramètre tournée dans le sens voulu
+# rotate a piece to the left
 def rotateL(piece):
     piece2=[]
     piece2.append(piece[0])
@@ -155,17 +157,17 @@ def rotateL(piece):
 
     return piece2
 
-# Retourne la piece donnée en paramètre tournée dans le sens voulu
+# rotate a piece to the right
 def rotateR(piece):
     for i in range(3):
         piece=rotateL(piece)
     return piece
 
-# Ajoute la piece au plateau
+# add piece to the bottom of the main board
 def addPiece(tab, piece, position):
     valide=True
     posValide=0
-    for ligne in range(0, longueur-len(piece[1])+1):
+    for ligne in range(0, length-len(piece[1])+1):
         for i in range(len(piece[1])):
             for j in range(len(piece[1][i])):
                 if piece[1][i][j]==1 and tab[ligne+i][int(position)+j-1]!=0:
@@ -179,7 +181,7 @@ def addPiece(tab, piece, position):
                 tab[posValide+i][int(position)+j-1]=piece[1][i][j]
     return(tab)
 
-# Ajoute la piece actuelle eu haut du tableau
+# add piece to the top of the board, used for previsualisation
 def previsu(tab, piece, position):
     for i in range(len(piece[1])):
         for j in range(len(piece[1][i])):
@@ -187,11 +189,11 @@ def previsu(tab, piece, position):
                 tab[i][int(position)+j-1]=piece[1][i][j]
     return(tab)
 
-# Verifie si le joueur a gagné
+# check if the bridge is valid
 def checkWin(tab):
     h_actu=h_start
     v=True
-    for col in range(largeur):
+    for col in range(width):
         if tab[h_actu-1][col]:
             h_actu-=1
         elif tab[h_actu][col]:
@@ -206,7 +208,7 @@ def checkWin(tab):
     
     return v
 
-# Boucle du jeu
+# main game loop
 def game():
     stock=[]
     next_pieces=[]
@@ -215,7 +217,7 @@ def game():
     demarrage=False
 
     for i in range(3):
-        next_pieces.append(aleaPiece(pieces))
+        next_pieces.append(aleaPiece())
     
     while not demarrage:
         m=menu()
@@ -236,15 +238,15 @@ def game():
         affichage(tab)
         ch=choix(next_pieces, stock)
 
-        for i in range(longueur):
-            for j in range (largeur):
+        for i in range(length):
+            for j in range (width):
                 tab1[i][j]=tab[i][j]
 
         if ch=="S":
             if stock==[]:
                 stock=next_pieces[0]
                 next_pieces.pop(0)
-                next_pieces.append(aleaPiece(pieces))
+                next_pieces.append(aleaPiece())
             else:
                 temp=copy.deepcopy(stock)
                 stock=next_pieces[0]
@@ -259,14 +261,14 @@ def game():
             next_pieces.pop(0)
             next_pieces.insert(0, p)
         elif ch=="1" or "2" or "3" or "4" or "5" or "6" or "7" or "8" or "9" or "10": 
-            if int(ch)+len(next_pieces[0][1][0])-2<largeur:
+            if int(ch)+len(next_pieces[0][1][0])-2<width:
                 affichage(previsu(tab1, next_pieces[0], ch))
 
                 if validationPrevisu()=="O":
                     addPiece(tab1, next_pieces[0], ch)
                     addPiece(tab, next_pieces[0], ch)
                     next_pieces.pop(0)
-                    next_pieces.append(aleaPiece(pieces))
+                    next_pieces.append(aleaPiece())
                     print("validé")
             else:
                 print("raté")
@@ -280,7 +282,8 @@ def game():
         affichage(tab)
     
         
-# Lancement du jeu
+# game launch
+
 os.system('cls')
 
 while True:
